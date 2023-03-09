@@ -16,7 +16,11 @@ func (m *MapValue) Get(paths ...string) Value {
 	if len(paths) == 0 {
 		return m
 	}
-	marshal, err := json.Marshal(m.value[paths[0]])
+	v, ok := m.value[paths[0]]
+	if !ok {
+		return NewErrorValue(errors.Errorf("not found path %v", paths[0]))
+	}
+	marshal, err := json.Marshal(v)
 	if err != nil {
 		panic(err)
 	}
@@ -47,7 +51,9 @@ func (m *MapValue) Bytes() []byte {
 }
 
 func (m *MapValue) AsSlice() []Value {
-	slice, err := convert[[]map[string]any](m.value)
+	var slice []any
+	bytes := m.Bytes()
+	err := json.Unmarshal(bytes, &slice)
 	if err != nil {
 		panic(err)
 	}
@@ -62,12 +68,12 @@ func (m *MapValue) AsSlice() []Value {
 	return ret
 }
 
-func (m *MapValue) String() string {
-	return string(m.Bytes())
+func (m *MapValue) String() (string, error) {
+	return string(m.Bytes()), nil
 }
 
 func (m *MapValue) Int() (int64, error) {
-	str := m.String()
+	str, _ := m.String()
 	ret, err := strconv.ParseInt(str, 10, 64)
 	if err != nil {
 		return 0, errors.WithStack(err)
@@ -76,7 +82,7 @@ func (m *MapValue) Int() (int64, error) {
 }
 
 func (m *MapValue) Bool() (bool, error) {
-	str := m.String()
+	str, _ := m.String()
 	ret, err := strconv.ParseBool(str)
 	if err != nil {
 		return false, errors.WithStack(err)

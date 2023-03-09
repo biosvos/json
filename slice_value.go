@@ -34,8 +34,8 @@ func (s *SliceValue) AsSlice() []Value {
 	return ret
 }
 
-func (s *SliceValue) String() string {
-	return string(s.Bytes())
+func (s *SliceValue) String() (string, error) {
+	return string(s.Bytes()), nil
 }
 
 func (s *SliceValue) Int() (int64, error) {

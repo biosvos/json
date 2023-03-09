@@ -28,15 +28,16 @@ func (p *PrimitiveValue) get(paths string) Value {
 }
 
 func (p *PrimitiveValue) AsSlice() []Value {
-	return []Value{NewErrorValue(errors.New("failed to convert"))}
+	return nil
 }
 
-func (p *PrimitiveValue) String() string {
-	return strings.Trim(string(p.value), "\"")
+func (p *PrimitiveValue) String() (string, error) {
+	return strings.Trim(string(p.value), "\""), nil
 }
 
 func (p *PrimitiveValue) Int() (int64, error) {
-	ret, err := strconv.ParseInt(p.String(), 10, 64)
+	str, _ := p.String()
+	ret, err := strconv.ParseInt(str, 10, 64)
 	if err != nil {
 		return 0, err
 	}
@@ -44,7 +45,8 @@ func (p *PrimitiveValue) Int() (int64, error) {
 }
 
 func (p *PrimitiveValue) Bool() (bool, error) {
-	ret, err := strconv.ParseBool(p.String())
+	str, _ := p.String()
+	ret, err := strconv.ParseBool(str)
 	if err != nil {
 		return false, err
 	}

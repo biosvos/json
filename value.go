@@ -1,19 +1,24 @@
 package json
 
-import "encoding/json"
-
-//Get(paths string) Value
+import (
+	"encoding/json"
+	"github.com/pkg/errors"
+)
 
 type Value interface {
 	Get(paths ...string) Value
 	AsSlice() []Value
-	String() string
+	String() (string, error)
 	Int() (int64, error)
 	Bool() (bool, error)
 	Bytes() []byte
 }
 
 func NewJsonValue(v []byte) Value {
+	if v == nil {
+		return NewErrorValue(errors.New("failed to new json value"))
+	}
+
 	m, err := tryMap(v)
 	if err == nil {
 		return NewMapValue(m)

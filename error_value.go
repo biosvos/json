@@ -18,8 +18,8 @@ func (e *ErrorValue) AsSlice() []Value {
 	return nil
 }
 
-func (e *ErrorValue) String() string {
-	return ""
+func (e *ErrorValue) String() (string, error) {
+	return "", e.value
 }
 
 func (e *ErrorValue) Int() (int64, error) {

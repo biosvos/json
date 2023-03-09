@@ -34,11 +34,16 @@ const (
 func TestNewJsonValue(t *testing.T) {
 	root := NewJsonValue([]byte(exampleJson))
 	get := root.Get("glossary", "title")
-	glossaryTitle := get.String()
+	glossaryTitle, err := get.String()
+	require.NoError(t, err)
 	require.Equal(t, "example glossary", glossaryTitle)
 
 	get = root.Get("glossary", "GlossDiv", "GlossList", "GlossEntry", "GlossDef", "GlossSeeAlso")
 	slice := get.AsSlice()
-	require.Equal(t, "GML", slice[0].String())
-	require.Equal(t, "XML", slice[1].String())
+	str, err := slice[0].String()
+	require.NoError(t, err)
+	require.Equal(t, "GML", str)
+	str, err = slice[1].String()
+	require.NoError(t, err)
+	require.Equal(t, "XML", str)
 }
