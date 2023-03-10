@@ -1,6 +1,7 @@
 package json
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/pkg/errors"
 	"strconv"
@@ -36,4 +37,10 @@ func Copy(dst any, src string) error {
 		return errors.WithStack(err)
 	}
 	return nil
+}
+
+func Pretty(str string) string {
+	var buffer bytes.Buffer
+	_ = json.Indent(&buffer, []byte(str), "", "  ")
+	return buffer.String()
 }

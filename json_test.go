@@ -38,3 +38,8 @@ func TestCopy(t *testing.T) {
 	require.Equal(t, "kind", kind.Name)
 	require.Equal(t, "good", kind.Wow)
 }
+
+func TestPretty(t *testing.T) {
+	pretty := Pretty(`{"name":"kind","wow":"good"}`)
+	t.Log(pretty)
+}
