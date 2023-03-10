@@ -5,10 +5,9 @@ import "github.com/pkg/errors"
 type Value interface {
 	Get(paths ...string) (Value, error)
 	List(paths ...string) ([]Value, error)
+	slice() ([]Value, error)
 	String() string
 	Bytes() []byte
-
-	slice() ([]Value, error)
 }
 
 func slice(v Value, paths ...string) ([]Value, error) {

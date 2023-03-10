@@ -11,10 +11,6 @@ type sliceValue struct {
 	value []any
 }
 
-func (s *sliceValue) List(paths ...string) ([]Value, error) {
-	return slice(s, paths...)
-}
-
 func newSliceValue(value []any) *sliceValue {
 	return &sliceValue{value: value}
 }
@@ -24,6 +20,10 @@ func (s *sliceValue) Get(paths ...string) (Value, error) {
 		return s, nil
 	}
 	return nil, errors.New("failed to get")
+}
+
+func (s *sliceValue) List(paths ...string) ([]Value, error) {
+	return slice(s, paths...)
 }
 
 func (s *sliceValue) slice() ([]Value, error) {

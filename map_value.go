@@ -11,10 +11,6 @@ type mapValue struct {
 	value map[string]any
 }
 
-func (m *mapValue) List(paths ...string) ([]Value, error) {
-	return slice(m, paths...)
-}
-
 func newMapValue(value map[string]any) *mapValue {
 	return &mapValue{
 		value: value,
@@ -32,6 +28,10 @@ func (m *mapValue) Get(paths ...string) (Value, error) {
 	marshal, _ := json.Marshal(v)
 	value, _ := NewJsonValue(marshal)
 	return value.Get(paths[1:]...)
+}
+
+func (m *mapValue) List(paths ...string) ([]Value, error) {
+	return slice(m, paths...)
 }
 
 func (m *mapValue) slice() ([]Value, error) {
