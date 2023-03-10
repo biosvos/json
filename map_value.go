@@ -17,32 +17,29 @@ func newMapValue(value map[string]any) *mapValue {
 	}
 }
 
-func (m *mapValue) Get(paths ...string) (Value, error) {
+func (m *mapValue) Get(paths ...string) Value {
 	if len(paths) == 0 {
-		return m, nil
+		return m
 	}
 	v, ok := m.value[paths[0]]
 	if !ok {
-		return nil, errors.Errorf("not found path %v", paths[0])
+		return newErrorValue(errors.Errorf("not found path %v", paths[0]))
 	}
 	marshal, _ := json.Marshal(v)
-	value, _ := NewJsonValue(marshal)
+	value := NewJsonValue(marshal)
 	return value.Get(paths[1:]...)
 }
 
-func (m *mapValue) List(paths ...string) ([]Value, error) {
-	return slice(m, paths...)
-}
-
-func (m *mapValue) slice() ([]Value, error) {
-	return nil, errors.New("failed to as slice")
+func (m *mapValue) Slice() []Value {
+	value := newErrorValue(errors.New("failed to as slice"))
+	return value.Slice()
 }
 
 func (m *mapValue) String() string {
-	return string(m.Bytes())
+	ret, _ := json.Marshal(m.value)
+	return string(ret)
 }
 
-func (m *mapValue) Bytes() []byte {
-	ret, _ := json.Marshal(m.value)
-	return ret
+func (m *mapValue) Err() error {
+	return nil
 }

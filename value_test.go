@@ -32,30 +32,22 @@ const (
 )
 
 func TestJsonNew(t *testing.T) {
-	_, err := NewJsonValue([]byte(exampleJson))
+	root := NewJsonValue([]byte(exampleJson))
 
-	require.NoError(t, err)
+	require.NoError(t, root.Err())
 }
 
 func TestJsonGet(t *testing.T) {
-	root, _ := NewJsonValue([]byte(exampleJson))
+	root := NewJsonValue([]byte(exampleJson))
 
-	_, err := root.Get("glossary", "title")
+	value := root.Get("glossary", "title")
 
-	require.NoError(t, err)
-}
-
-func TestJsonList(t *testing.T) {
-	root, _ := NewJsonValue([]byte(exampleJson))
-
-	_, err := root.List("glossary", "GlossDiv", "GlossList", "GlossEntry", "GlossDef", "GlossSeeAlso")
-
-	require.NoError(t, err)
+	require.NoError(t, value.Err())
 }
 
 func TestString(t *testing.T) {
-	root, _ := NewJsonValue([]byte(exampleJson))
-	value, _ := root.List("glossary", "GlossDiv", "GlossList", "GlossEntry", "GlossDef", "GlossSeeAlso")
+	root := NewJsonValue([]byte(exampleJson))
+	value := root.Get("glossary", "GlossDiv", "GlossList", "GlossEntry", "GlossDef", "GlossSeeAlso").Slice()
 
 	require.Equal(t, "GML", value[0].String())
 	require.Equal(t, "XML", value[1].String())

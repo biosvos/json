@@ -3,35 +3,26 @@ package json
 import "github.com/pkg/errors"
 
 type Value interface {
-	Get(paths ...string) (Value, error)
-	List(paths ...string) ([]Value, error)
-	slice() ([]Value, error)
+	Get(paths ...string) Value
+	Slice() []Value
 	String() string
-	Bytes() []byte
+	Err() error
 }
 
-func slice(v Value, paths ...string) ([]Value, error) {
-	get, err := v.Get(paths...)
-	if err != nil {
-		return nil, err
-	}
-	return get.slice()
-}
-
-func NewJsonValue(v []byte) (Value, error) {
+func NewJsonValue(v []byte) Value {
 	if v == nil {
-		return nil, errors.New("failed to new json value. cause: v is nil")
+		return newErrorValue(errors.New("failed to new json value. cause: v is nil"))
 	}
 
 	m, err := toMap(v)
 	if err == nil {
-		return newMapValue(m), nil
+		return newMapValue(m)
 	}
 
 	s, err := toSlice(v)
 	if err == nil {
-		return newSliceValue(s), nil
+		return newSliceValue(s)
 	}
 
-	return newPrimitiveValue(v), nil
+	return newPrimitiveValue(v)
 }

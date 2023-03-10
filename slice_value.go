@@ -15,35 +15,28 @@ func newSliceValue(value []any) *sliceValue {
 	return &sliceValue{value: value}
 }
 
-func (s *sliceValue) Get(paths ...string) (Value, error) {
+func (s *sliceValue) Get(paths ...string) Value {
 	if len(paths) == 0 {
-		return s, nil
+		return s
 	}
-	return nil, errors.New("failed to get")
+	return newErrorValue(errors.New("failed to get"))
 }
 
-func (s *sliceValue) List(paths ...string) ([]Value, error) {
-	return slice(s, paths...)
-}
-
-func (s *sliceValue) slice() ([]Value, error) {
+func (s *sliceValue) Slice() []Value {
 	var ret []Value
 	for _, item := range s.value {
 		marshal, _ := json.Marshal(item)
-		value, err := NewJsonValue(marshal)
-		if err != nil {
-			return nil, errors.WithStack(err)
-		}
+		value := NewJsonValue(marshal)
 		ret = append(ret, value)
 	}
-	return ret, nil
+	return ret
 }
 
 func (s *sliceValue) String() string {
-	return string(s.Bytes())
+	marshal, _ := json.Marshal(s.value)
+	return string(marshal)
 }
 
-func (s *sliceValue) Bytes() []byte {
-	ret, _ := json.Marshal(s.value)
-	return ret
+func (s *sliceValue) Err() error {
+	return nil
 }

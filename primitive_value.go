@@ -14,23 +14,20 @@ func newPrimitiveValue(value []byte) *primitiveValue {
 	return &primitiveValue{value: value}
 }
 
-func (p *primitiveValue) Get(paths ...string) (Value, error) {
+func (p *primitiveValue) Get(paths ...string) Value {
 	if len(paths) == 0 {
-		return p, nil
+		return p
 	}
-	return nil, errors.Errorf("failed to get %v", paths[0])
+	return newErrorValue(errors.Errorf("failed to get %v", paths[0]))
 }
 
-func (p *primitiveValue) List(paths ...string) ([]Value, error) {
-	return slice(p, paths...)
-}
-
-func (p *primitiveValue) slice() ([]Value, error) {
-	return nil, errors.New("failed to as slice")
+func (p *primitiveValue) Slice() []Value {
+	value := newErrorValue(errors.New("failed to as slice"))
+	return value.Slice()
 }
 
 func (p *primitiveValue) String() string {
-	str := string(p.Bytes())
+	str := string(p.value)
 	if len(str) < 3 {
 		return str
 	}
@@ -40,6 +37,6 @@ func (p *primitiveValue) String() string {
 	return str
 }
 
-func (p *primitiveValue) Bytes() []byte {
-	return p.value
+func (p *primitiveValue) Err() error {
+	return nil
 }
