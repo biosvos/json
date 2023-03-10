@@ -5,20 +5,18 @@ import (
 	"github.com/pkg/errors"
 )
 
-type byteList []byte
-
-func (b byteList) toMap() (map[string]any, error) {
+func toMap(bytes []byte) (map[string]any, error) {
 	m := map[string]any{}
-	err := json.Unmarshal(b, &m)
+	err := json.Unmarshal(bytes, &m)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
 	return m, nil
 }
 
-func (b byteList) toSlice() ([]any, error) {
+func toSlice(bytes []byte) ([]any, error) {
 	var ret []any
-	err := json.Unmarshal(b, &ret)
+	err := json.Unmarshal(bytes, &ret)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

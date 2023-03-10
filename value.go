@@ -23,13 +23,12 @@ func NewJsonValue(v []byte) (Value, error) {
 		return nil, errors.New("failed to new json value. cause: v is nil")
 	}
 
-	bytes := byteList(v)
-	m, err := bytes.toMap()
+	m, err := toMap(v)
 	if err == nil {
 		return newMapValue(m), nil
 	}
 
-	s, err := bytes.toSlice()
+	s, err := toSlice(v)
 	if err == nil {
 		return newSliceValue(s), nil
 	}
