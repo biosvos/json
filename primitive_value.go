@@ -10,6 +10,10 @@ type primitiveValue struct {
 	value []byte
 }
 
+func (p *primitiveValue) List(paths ...string) ([]Value, error) {
+	return slice(p, paths...)
+}
+
 func newPrimitiveValue(value []byte) *primitiveValue {
 	return &primitiveValue{value: value}
 }
@@ -21,7 +25,7 @@ func (p *primitiveValue) Get(paths ...string) (Value, error) {
 	return nil, errors.Errorf("failed to get %v", paths[0])
 }
 
-func (p *primitiveValue) AsSlice() ([]Value, error) {
+func (p *primitiveValue) slice() ([]Value, error) {
 	return nil, errors.New("failed to as slice")
 }
 

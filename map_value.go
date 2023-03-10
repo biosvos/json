@@ -11,6 +11,10 @@ type mapValue struct {
 	value map[string]any
 }
 
+func (m *mapValue) List(paths ...string) ([]Value, error) {
+	return slice(m, paths...)
+}
+
 func newMapValue(value map[string]any) *mapValue {
 	return &mapValue{
 		value: value,
@@ -30,7 +34,7 @@ func (m *mapValue) Get(paths ...string) (Value, error) {
 	return value.Get(paths[1:]...)
 }
 
-func (m *mapValue) AsSlice() ([]Value, error) {
+func (m *mapValue) slice() ([]Value, error) {
 	return nil, errors.New("failed to as slice")
 }
 

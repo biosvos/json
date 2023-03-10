@@ -45,20 +45,18 @@ func TestJsonGet(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestJsonAsSlice(t *testing.T) {
+func TestJsonList(t *testing.T) {
 	root, _ := NewJsonValue([]byte(exampleJson))
-	value, _ := root.Get("glossary", "GlossDiv", "GlossList", "GlossEntry", "GlossDef", "GlossSeeAlso")
 
-	_, err := value.AsSlice()
+	_, err := root.List("glossary", "GlossDiv", "GlossList", "GlossEntry", "GlossDef", "GlossSeeAlso")
 
 	require.NoError(t, err)
 }
 
 func TestString(t *testing.T) {
 	root, _ := NewJsonValue([]byte(exampleJson))
-	value, _ := root.Get("glossary", "GlossDiv", "GlossList", "GlossEntry", "GlossDef", "GlossSeeAlso")
-	slice, _ := value.AsSlice()
+	value, _ := root.List("glossary", "GlossDiv", "GlossList", "GlossEntry", "GlossDef", "GlossSeeAlso")
 
-	require.Equal(t, "GML", slice[0].String())
-	require.Equal(t, "XML", slice[1].String())
+	require.Equal(t, "GML", value[0].String())
+	require.Equal(t, "XML", value[1].String())
 }

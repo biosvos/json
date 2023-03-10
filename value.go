@@ -4,9 +4,19 @@ import "github.com/pkg/errors"
 
 type Value interface {
 	Get(paths ...string) (Value, error)
-	AsSlice() ([]Value, error)
+	List(paths ...string) ([]Value, error)
 	String() string
 	Bytes() []byte
+
+	slice() ([]Value, error)
+}
+
+func slice(v Value, paths ...string) ([]Value, error) {
+	get, err := v.Get(paths...)
+	if err != nil {
+		return nil, err
+	}
+	return get.slice()
 }
 
 func NewJsonValue(v []byte) (Value, error) {
