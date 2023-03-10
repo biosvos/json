@@ -5,51 +5,41 @@ import (
 	"github.com/pkg/errors"
 )
 
-var _ Value = &SliceValue{}
+var _ Value = &sliceValue{}
 
-type SliceValue struct {
+type sliceValue struct {
 	value []any
 }
 
-func NewSliceValue(value []any) *SliceValue {
-	return &SliceValue{value: value}
+func newSliceValue(value []any) *sliceValue {
+	return &sliceValue{value: value}
 }
 
-func (s *SliceValue) Get(paths ...string) Value {
+func (s *sliceValue) Get(paths ...string) (Value, error) {
 	if len(paths) == 0 {
-		return s
+		return s, nil
 	}
-	return NewErrorValue(errors.Errorf("unknown path %v", paths))
+	return nil, errors.New("failed to get")
 }
 
-func (s *SliceValue) AsSlice() []Value {
+func (s *sliceValue) AsSlice() ([]Value, error) {
 	var ret []Value
-	for _, v := range s.value {
-		marshal, err := json.Marshal(v)
+	for _, item := range s.value {
+		marshal, _ := json.Marshal(item)
+		value, err := NewJsonValue(marshal)
 		if err != nil {
-			panic(err)
+			return nil, errors.WithStack(err)
 		}
-		ret = append(ret, NewJsonValue(marshal))
+		ret = append(ret, value)
 	}
-	return ret
+	return ret, nil
 }
 
-func (s *SliceValue) String() (string, error) {
-	return string(s.Bytes()), nil
+func (s *sliceValue) String() string {
+	return string(s.Bytes())
 }
 
-func (s *SliceValue) Int() (int64, error) {
-	return 0, errors.New("failed to convert")
-}
-
-func (s *SliceValue) Bool() (bool, error) {
-	return false, errors.New("failed to convert")
-}
-
-func (s *SliceValue) Bytes() []byte {
-	ret, err := json.Marshal(s.value)
-	if err != nil {
-		panic(err)
-	}
+func (s *sliceValue) Bytes() []byte {
+	ret, _ := json.Marshal(s.value)
 	return ret
 }

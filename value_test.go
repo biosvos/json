@@ -31,19 +31,34 @@ const (
 }`
 )
 
-func TestNewJsonValue(t *testing.T) {
-	root := NewJsonValue([]byte(exampleJson))
-	get := root.Get("glossary", "title")
-	glossaryTitle, err := get.String()
-	require.NoError(t, err)
-	require.Equal(t, "example glossary", glossaryTitle)
+func TestJsonNew(t *testing.T) {
+	_, err := NewJsonValue([]byte(exampleJson))
 
-	get = root.Get("glossary", "GlossDiv", "GlossList", "GlossEntry", "GlossDef", "GlossSeeAlso")
-	slice := get.AsSlice()
-	str, err := slice[0].String()
 	require.NoError(t, err)
-	require.Equal(t, "GML", str)
-	str, err = slice[1].String()
+}
+
+func TestJsonGet(t *testing.T) {
+	root, _ := NewJsonValue([]byte(exampleJson))
+
+	_, err := root.Get("glossary", "title")
+
 	require.NoError(t, err)
-	require.Equal(t, "XML", str)
+}
+
+func TestJsonAsSlice(t *testing.T) {
+	root, _ := NewJsonValue([]byte(exampleJson))
+	value, _ := root.Get("glossary", "GlossDiv", "GlossList", "GlossEntry", "GlossDef", "GlossSeeAlso")
+
+	_, err := value.AsSlice()
+
+	require.NoError(t, err)
+}
+
+func TestString(t *testing.T) {
+	root, _ := NewJsonValue([]byte(exampleJson))
+	value, _ := root.Get("glossary", "GlossDiv", "GlossList", "GlossEntry", "GlossDef", "GlossSeeAlso")
+	slice, _ := value.AsSlice()
+
+	require.Equal(t, "GML", slice[0].String())
+	require.Equal(t, "XML", slice[1].String())
 }

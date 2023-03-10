@@ -1,51 +1,29 @@
 package json
 
-import (
-	"encoding/json"
-	"github.com/pkg/errors"
-)
+import "github.com/pkg/errors"
 
 type Value interface {
-	Get(paths ...string) Value
-	AsSlice() []Value
-	String() (string, error)
-	Int() (int64, error)
-	Bool() (bool, error)
+	Get(paths ...string) (Value, error)
+	AsSlice() ([]Value, error)
+	String() string
 	Bytes() []byte
 }
 
-func NewJsonValue(v []byte) Value {
+func NewJsonValue(v []byte) (Value, error) {
 	if v == nil {
-		return NewErrorValue(errors.New("failed to new json value"))
+		return nil, errors.New("failed to new json value. cause: v is nil")
 	}
 
-	m, err := tryMap(v)
+	bytes := byteList(v)
+	m, err := bytes.toMap()
 	if err == nil {
-		return NewMapValue(m)
+		return newMapValue(m), nil
 	}
 
-	s, err := trySlice(v)
+	s, err := bytes.toSlice()
 	if err == nil {
-		return NewSliceValue(s)
+		return newSliceValue(s), nil
 	}
 
-	return NewPrimitiveValue(v)
-}
-
-func tryMap(v []byte) (map[string]any, error) {
-	ret := map[string]any{}
-	err := json.Unmarshal(v, &ret)
-	if err != nil {
-		return nil, err
-	}
-	return ret, nil
-}
-
-func trySlice(v []byte) ([]any, error) {
-	var ret []any
-	err := json.Unmarshal(v, &ret)
-	if err != nil {
-		return nil, err
-	}
-	return ret, nil
+	return newPrimitiveValue(v), nil
 }

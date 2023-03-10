@@ -3,89 +3,42 @@ package json
 import (
 	"encoding/json"
 	"github.com/pkg/errors"
-	"strconv"
 )
 
-var _ Value = &MapValue{}
+var _ Value = &mapValue{}
 
-type MapValue struct {
+type mapValue struct {
 	value map[string]any
 }
 
-func (m *MapValue) Get(paths ...string) Value {
-	if len(paths) == 0 {
-		return m
-	}
-	v, ok := m.value[paths[0]]
-	if !ok {
-		return NewErrorValue(errors.Errorf("not found path %v", paths[0]))
-	}
-	marshal, err := json.Marshal(v)
-	if err != nil {
-		panic(err)
-	}
-	value := NewJsonValue(marshal)
-	return value.Get(paths[1:]...)
-}
-
-func NewMapValue(value map[string]any) *MapValue {
-	return &MapValue{
+func newMapValue(value map[string]any) *mapValue {
+	return &mapValue{
 		value: value,
 	}
 }
 
-func (m *MapValue) get(path string) Value {
-	marshal, err := json.Marshal(m.value[path])
-	if err != nil {
-		panic(err)
+func (m *mapValue) Get(paths ...string) (Value, error) {
+	if len(paths) == 0 {
+		return m, nil
 	}
-	return NewJsonValue(marshal)
+	v, ok := m.value[paths[0]]
+	if !ok {
+		return nil, errors.Errorf("not found path %v", paths[0])
+	}
+	marshal, _ := json.Marshal(v)
+	value, _ := NewJsonValue(marshal)
+	return value.Get(paths[1:]...)
 }
 
-func (m *MapValue) Bytes() []byte {
-	ret, err := json.Marshal(m.value)
-	if err != nil {
-		panic(err)
-	}
+func (m *mapValue) AsSlice() ([]Value, error) {
+	return nil, errors.New("failed to as slice")
+}
+
+func (m *mapValue) String() string {
+	return string(m.Bytes())
+}
+
+func (m *mapValue) Bytes() []byte {
+	ret, _ := json.Marshal(m.value)
 	return ret
-}
-
-func (m *MapValue) AsSlice() []Value {
-	var slice []any
-	bytes := m.Bytes()
-	err := json.Unmarshal(bytes, &slice)
-	if err != nil {
-		panic(err)
-	}
-	var ret []Value
-	for _, item := range slice {
-		marshal, err := json.Marshal(item)
-		if err != nil {
-			panic(err)
-		}
-		ret = append(ret, NewJsonValue(marshal))
-	}
-	return ret
-}
-
-func (m *MapValue) String() (string, error) {
-	return string(m.Bytes()), nil
-}
-
-func (m *MapValue) Int() (int64, error) {
-	str, _ := m.String()
-	ret, err := strconv.ParseInt(str, 10, 64)
-	if err != nil {
-		return 0, errors.WithStack(err)
-	}
-	return ret, nil
-}
-
-func (m *MapValue) Bool() (bool, error) {
-	str, _ := m.String()
-	ret, err := strconv.ParseBool(str)
-	if err != nil {
-		return false, errors.WithStack(err)
-	}
-	return ret, nil
 }

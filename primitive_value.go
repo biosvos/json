@@ -2,57 +2,40 @@ package json
 
 import (
 	"github.com/pkg/errors"
-	"strconv"
-	"strings"
 )
 
-var _ Value = &PrimitiveValue{}
+var _ Value = &primitiveValue{}
 
-type PrimitiveValue struct {
+type primitiveValue struct {
 	value []byte
 }
 
-func (p *PrimitiveValue) Get(paths ...string) Value {
+func newPrimitiveValue(value []byte) *primitiveValue {
+	return &primitiveValue{value: value}
+}
+
+func (p *primitiveValue) Get(paths ...string) (Value, error) {
 	if len(paths) == 0 {
-		return p
+		return p, nil
 	}
-	return p.get(paths[0])
+	return nil, errors.Errorf("failed to get %v", paths[0])
 }
 
-func NewPrimitiveValue(value []byte) *PrimitiveValue {
-	return &PrimitiveValue{value: value}
+func (p *primitiveValue) AsSlice() ([]Value, error) {
+	return nil, errors.New("failed to as slice")
 }
 
-func (p *PrimitiveValue) get(paths string) Value {
-	return NewErrorValue(errors.Errorf("failed to get %v", paths))
-}
-
-func (p *PrimitiveValue) AsSlice() []Value {
-	return nil
-}
-
-func (p *PrimitiveValue) String() (string, error) {
-	return strings.Trim(string(p.value), "\""), nil
-}
-
-func (p *PrimitiveValue) Int() (int64, error) {
-	str, _ := p.String()
-	ret, err := strconv.ParseInt(str, 10, 64)
-	if err != nil {
-		return 0, err
+func (p *primitiveValue) String() string {
+	str := string(p.Bytes())
+	if len(str) < 3 {
+		return str
 	}
-	return ret, nil
-}
-
-func (p *PrimitiveValue) Bool() (bool, error) {
-	str, _ := p.String()
-	ret, err := strconv.ParseBool(str)
-	if err != nil {
-		return false, err
+	if str[0] == '"' && str[len(str)-1] == '"' {
+		return str[1 : len(str)-1]
 	}
-	return ret, nil
+	return str
 }
 
-func (p *PrimitiveValue) Bytes() []byte {
+func (p *primitiveValue) Bytes() []byte {
 	return p.value
 }
